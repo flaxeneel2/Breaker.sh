@@ -6,3 +6,5 @@ This egg is not meant for commercial use and if you do use it. I will not take a
 
 #### NOTE:
 This is purely for a learning experience for both myself and anyone else interested in making multi eggs.
+
+To the people who are just going to skid this: Just don't, it would be more logical to just make your own. This is not meant for commercial use, therefore it is not optimized that well.
