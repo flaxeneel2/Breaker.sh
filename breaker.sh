@@ -36,20 +36,36 @@ BLINK=$(tput blink)
 REV=$(tput rev)
 STANDOUT=$(tput smso)
 
+
+#################################################
+#                   Functions                   #
+#################################################
+
+load_jabba () {
+  if [[ ! -d "/home/container/.jabba" ]]; then
+    echo -e "${PURPLE}Jabba not found! Insalling jabba${DGRAY}"
+    curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash -s -- --skip-rc && . /home/container/.jabba/jabba.sh
+  fi;
+  source /home/container/.jabba/jabba.sh
+}
+
+
 ################################################
 #                     Main                     #
 ################################################
 
 #toilet -f smblock --filter border:metal 'Breaker.sh'
-echo -e "${PURPLE}1${LPURPLE}) ${PURPLE}Minecraft java"
-echo -e "${PURPLE}2${LPURPLE}) ${PURPLE}Minecraft bedrock"
-echo -e "${PURPLE}3${LPURPLE}) ${PURPLE}Discord Bots"
-read -p "${NORMAL}Selection: " OPTION
+echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}Minecraft java"
+echo -e "${YELLOW}2${LPURPLE}) ${PURPLE}Minecraft bedrock"
+echo -e "${YELLOW}3${LPURPLE}) ${PURPLE}Discord Bots"
+read -e -p "${YELLOW}Selection: " OPTION
 if [[ "$OPTION" = "1" ]]; then
-  echo -e "${PURPLE}1${LPURPLE}) ${PURPLE}PaperMC"
-  read -p "${NORMAL}Selection: " OPTION_TWO
+  echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}PaperMC"
+  read -r -p "${NORMAL}Selection: " OPTION_TWO
   if [[ "$OPTION_TWO" = "1" ]]; then
+    load_jabba
     echo -e "${PURPLE}Installing PaperMC${DGRAY}"
+
   fi
 
 else

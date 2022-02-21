@@ -1,6 +1,6 @@
 FROM debian:stable
 
-RUN apt-get update && apt-get upgrade && apt-get install toilet build-essential git curl boxes figlet -y \
+RUN apt-get update && apt-get upgrade && apt-get install toilet build-essential git curl boxes figlet jq -y \
     && adduser --gecos "" --disabled-password --home /home/container container
 
 COPY ./breaker /breaker
