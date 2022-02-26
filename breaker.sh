@@ -55,9 +55,8 @@ install_paper () {
   read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" OPTION_TWO
   if [[ "$OPTION_TWO" = "1" ]]; then
     load_jabba
-    ask_till_valid "${PURPLE}Please choose the minecraft version you want to install! If you wish to view the list of available versions, enter ${YELLOW}list" "list" display_paper_versions
+    ask_till_valid "${PURPLE}Please choose the minecraft version you want to install! If you wish to view the list of available versions, enter ${YELLOW}list" "list" display_paper_versions PAPER_VERSION
     echo -e "${PURPLE}Installing PaperMC${DGRAY}"
-
   fi
 }
 
@@ -66,19 +65,22 @@ display_paper_versions () {
 }
 
 #This function takes 3 arguments
-# $1: message - The message to repeat on fail
-# $2: special_input - A special input that will trigger a special function if entered
+# $1: message: The message to repeat on fail
+# $2: special_input: A special input that will trigger a special function if entered
 # $3: handler: The handler for if special_input is entered
+# $4: variable: The variable to store the answer to
 #
 ask_till_valid () {
   while [ -z "$ANSWER" ]; do
     echo -e "$1"
     read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" ANSWER
-    if [[ ${ANSWER,,} == "$2" ]]; then
+    if [[ ${ANSWER,,} == "${2,,}" ]]; then
       $3
       unset ANSWER
     fi
   done
+  declare -g "${4}"="$ANSWER"
+  unset "$ANSWER"
 }
 
 ################################################
