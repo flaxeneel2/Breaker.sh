@@ -55,7 +55,7 @@ install_paper () {
   read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" OPTION_TWO
   if [[ "$OPTION_TWO" = "1" ]]; then
     load_jabba
-    ask_till_valid "${PURPLE}Please choose the minecraft version you want to install! If you wish to view the list of available versions, enter ${YELLOW}list" "list" display_paper_versions PAPER_VERSION
+    ask_till_valid "${PURPLE}Please choose the minecraft version you want to install! If you wish to view the list of available versions, enter ${YELLOW}list" "list" display_paper_versions PAPER_VERSION "$(curl -s https://papermc.io/api/v2/projects/paper | jq -r '.versions')"
     echo -e "${PURPLE}Installing PaperMC${DGRAY}"
   fi
 }
@@ -69,7 +69,7 @@ display_paper_versions () {
 # $2: special_input: A special input that will trigger a special function if entered
 # $3: handler: The handler for if special_input is entered
 # $4: variable: The variable to store the answer to
-#
+# $5: accepted_values: optional, if set, function will check if the input is valid or not
 ask_till_valid () {
   while [ -z "$ANSWER" ]; do
     echo -e "$1"
@@ -77,6 +77,13 @@ ask_till_valid () {
     if [[ ${ANSWER,,} == "${2,,}" ]]; then
       $3
       unset ANSWER
+      continue
+    fi
+    if [ -n "$5" ]; then
+      if [ "$(jq --arg ver "$ANSWER" 'index($ver)' <<< "$5")" == "null" ]; then
+        echo -e "${RED}Invalid input! Please try again"
+        unset ANSWER
+      fi
     fi
   done
   declare -g "${4}"="$ANSWER"
