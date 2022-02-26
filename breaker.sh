@@ -45,10 +45,41 @@ load_jabba () {
   if [[ ! -d "/home/container/.jabba" ]]; then
     echo -e "${PURPLE}Jabba not found! Insalling jabba${DGRAY}"
     curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash -s -- --skip-rc && . /home/container/.jabba/jabba.sh
+    echo -e "${NORMAL}"
   fi;
   source /home/container/.jabba/jabba.sh
 }
 
+install_paper () {
+  echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}PaperMC"
+  read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" OPTION_TWO
+  if [[ "$OPTION_TWO" = "1" ]]; then
+    load_jabba
+    ask_till_valid "${PURPLE}Please choose the minecraft version you want to install! If you wish to view the list of available versions, enter ${YELLOW}list" "list" display_paper_versions
+    echo -e "${PURPLE}Installing PaperMC${DGRAY}"
+
+  fi
+}
+
+display_paper_versions () {
+  curl -s https://papermc.io/api/v2/projects/paper | jq -r '.versions | .[] | "\u001b[32m\(.)"'
+}
+
+#This function takes 3 arguments
+# $1: message - The message to repeat on fail
+# $2: special_input - A special input that will trigger a special function if entered
+# $3: handler: The handler for if special_input is entered
+#
+ask_till_valid () {
+  while [ -z "$ANSWER" ]; do
+    echo -e "$1"
+    read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" ANSWER
+    if [[ ${ANSWER,,} == "$2" ]]; then
+      $3
+      unset ANSWER
+    fi
+  done
+}
 
 ################################################
 #                     Main                     #
@@ -58,16 +89,9 @@ load_jabba () {
 echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}Minecraft java"
 echo -e "${YELLOW}2${LPURPLE}) ${PURPLE}Minecraft bedrock"
 echo -e "${YELLOW}3${LPURPLE}) ${PURPLE}Discord Bots"
-read -e -p "${YELLOW}Selection: " OPTION
+read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" OPTION
 if [[ "$OPTION" = "1" ]]; then
-  echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}PaperMC"
-  read -r -p "${NORMAL}Selection: " OPTION_TWO
-  if [[ "$OPTION_TWO" = "1" ]]; then
-    load_jabba
-    echo -e "${PURPLE}Installing PaperMC${DGRAY}"
-
-  fi
-
+  install_paper
 else
   echo "2"
 fi
