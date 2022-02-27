@@ -62,10 +62,21 @@ install_paper () {
   load_jabba
   ask_till_valid "${PURPLE}Please choose the minecraft version you want to install! If you wish to view the list of available versions, enter ${YELLOW}list" "list" display_paper_versions PAPER_VERSION "$(curl -s https://papermc.io/api/v2/projects/paper | jq -r '.versions')"
   echo -e "${PURPLE}Installing PaperMC${DGRAY}"
+  get_latest_paper_build PAPER_VERSION LATEST_PAPER_BUILD
+  curl "https://papermc.io/api/v2/projects/paper/versions/${PAPER_VERSION}/builds/${LATEST_PAPER_BUILD}/downloads/paper-${PAPER_VERSION}-${LATEST_PAPER_BUILD}.jar" -o server.jar
+  echo -e "${PURPLE}PaperMC installed!"
 }
 
 display_paper_versions () {
   curl -s https://papermc.io/api/v2/projects/paper | jq -r '.versions | .[] | "\u001b[32m\(.)"'
+}
+
+get_latest_paper_build () {
+  if [ -n "$1" ] && [ -n "$2" ]; then
+    declare -g "${2}"="$(curl -s https://papermc.io/api/v2/projects/paper/versions/"${!1}" | jq -r '.builds[-1]')"
+  else
+    echo "Looks like flax forgot to pass arguments for getting latest paper build!";
+  fi;
 }
 
 
@@ -85,7 +96,7 @@ install_minecraft_java () {
 #            Misc            #
 ##############################
 
-#This function takes 3 arguments
+#This function takes 5 arguments
 # $1: message: The message to repeat on fail
 # $2: special_input: A special input that will trigger a special function if entered
 # $3: handler: The handler for if special_input is entered
@@ -124,12 +135,18 @@ echo -e "${LPURPLE}| ${PURPLE}\$\$  ${LPURPLE}\\ ${PURPLE}\$\$${LPURPLE}| ${PURP
 echo -e "${LPURPLE}| ${PURPLE}\$\$\$\$\$\$\$${LPURPLE}/|${PURPLE} \$\$      ${LPURPLE}|  ${PURPLE}\$\$\$\$\$\$\$${LPURPLE}|${PURPLE}  \$\$\$\$\$\$\$${LPURPLE}| ${PURPLE}\$\$ ${LPURPLE}\\ ${PURPLE} \$\$${LPURPLE}|${PURPLE}  \$\$\$\$\$\$\$${LPURPLE}|${PURPLE} \$\$"
 echo -e "${LPURPLE}|_______/ |__/       \\_______/ \\_______/|__/  \__/ \\_______/|__/"
 
-echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}Minecraft java"
-echo -e "${YELLOW}2${LPURPLE}) ${PURPLE}Minecraft bedrock"
-echo -e "${YELLOW}3${LPURPLE}) ${PURPLE}Discord Bots"
-read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" OPTION
-if [[ "$OPTION" = "1" ]]; then
-  install_minecraft_java
+if [ -f "server.jar" ]; then
+  load_jabba
+  echo -e "${PURPLE}Starting your server..."
+  echo -e "WIP"
 else
-  echo "2"
+  echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}Minecraft java"
+  echo -e "${YELLOW}2${LPURPLE}) ${PURPLE}Minecraft bedrock"
+  echo -e "${YELLOW}3${LPURPLE}) ${PURPLE}Discord Bots"
+  read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" OPTION
+  if [[ "$OPTION" = "1" ]]; then
+    install_minecraft_java
+  else
+    echo "2"
+  fi
 fi
