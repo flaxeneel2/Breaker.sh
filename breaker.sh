@@ -115,7 +115,15 @@ ask_till_valid () {
 #                     Main                     #
 ################################################
 
-#toilet -f smblock --filter border:metal 'Breaker.sh'
+echo -e " ${LPURPLE}/${PURPLE}\$\$\$\$\$\$\$                                ${LPURPLE}/${PURPLE}\$\$"
+echo -e "${LPURPLE}| ${PURPLE}\$\$${LPURPLE}__ ${PURPLE} \$\$                              ${LPURPLE}| ${PURPLE}\$\$"
+echo -e "${LPURPLE}| ${PURPLE}\$\$  ${LPURPLE}\\ ${PURPLE}\$\$  ${LPURPLE}/${PURPLE}\$\$\$\$\$\$   ${LPURPLE}/${PURPLE}\$\$\$\$\$\$   ${LPURPLE}/${PURPLE}\$\$\$\$\$\$ ${LPURPLE}|${PURPLE} \$\$   ${LPURPLE}/${PURPLE}\$\$  ${LPURPLE}/${PURPLE}\$\$\$\$\$\$   ${LPURPLE}/${PURPLE}\$\$\$\$\$\$"
+echo -e "${LPURPLE}| ${PURPLE}\$\$\$\$\$\$\$  ${LPURPLE}/${PURPLE}\$\$${LPURPLE}__  ${PURPLE}\$\$ ${LPURPLE}/${PURPLE}\$\$${LPURPLE}__  ${PURPLE}\$\$ ${LPURPLE}|____  ${PURPLE}\$\$${LPURPLE}| ${PURPLE}\$\$  ${LPURPLE}/${PURPLE}\$\$${LPURPLE}/ /${PURPLE}\$\$${LPURPLE}__  ${PURPLE}\$\$${LPURPLE} /${PURPLE}\$\$${LPURPLE}__  ${PURPLE}\$\$"
+echo -e "${LPURPLE}| ${PURPLE}\$\$${LPURPLE}__  ${PURPLE}\$\$${LPURPLE}| ${PURPLE}\$\$${LPURPLE}  \\__/|${PURPLE} \$\$\$\$\$\$\$\$ ${LPURPLE} /${PURPLE}\$\$\$\$\$\$\$${LPURPLE}| ${PURPLE}\$\$\$\$\$\$${LPURPLE}/ | ${PURPLE}\$\$\$\$\$\$\$\$${LPURPLE}| ${PURPLE}\$\$  ${LPURPLE}\\__/"
+echo -e "${LPURPLE}| ${PURPLE}\$\$  ${LPURPLE}\\ ${PURPLE}\$\$${LPURPLE}| ${PURPLE}\$\$      ${LPURPLE}| ${PURPLE}\$\$${LPURPLE}_____/ /${PURPLE}\$\$${LPURPLE}__  ${PURPLE}\$\$${LPURPLE}| ${PURPLE}\$\$${LPURPLE}_  ${PURPLE}\$\$ ${LPURPLE}| ${PURPLE}\$\$${LPURPLE}_____/| ${PURPLE}\$\$"
+echo -e "${LPURPLE}| ${PURPLE}\$\$\$\$\$\$\$${LPURPLE}/|${PURPLE} \$\$      ${LPURPLE}|  ${PURPLE}\$\$\$\$\$\$\$${LPURPLE}|${PURPLE}  \$\$\$\$\$\$\$${LPURPLE}| ${PURPLE}\$\$ ${LPURPLE}\\ ${PURPLE} \$\$${LPURPLE}|${PURPLE}  \$\$\$\$\$\$\$${LPURPLE}|${PURPLE} \$\$"
+echo -e "${LPURPLE}|_______/ |__/       \\_______/ \\_______/|__/  \__/ \\_______/|__/"
+
 echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}Minecraft java"
 echo -e "${YELLOW}2${LPURPLE}) ${PURPLE}Minecraft bedrock"
 echo -e "${YELLOW}3${LPURPLE}) ${PURPLE}Discord Bots"
