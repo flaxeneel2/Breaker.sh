@@ -41,6 +41,10 @@ STANDOUT=$(tput smso)
 #                   Functions                   #
 #################################################
 
+##############################
+#        Dependencies        #
+##############################
+
 load_jabba () {
   if [[ ! -d "/home/container/.jabba" ]]; then
     echo -e "${PURPLE}Jabba not found! Insalling jabba${DGRAY}"
@@ -50,19 +54,36 @@ load_jabba () {
   source /home/container/.jabba/jabba.sh
 }
 
+#############################
+#           Paper           #
+#############################
+
 install_paper () {
-  echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}PaperMC"
-  read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" OPTION_TWO
-  if [[ "$OPTION_TWO" = "1" ]]; then
-    load_jabba
-    ask_till_valid "${PURPLE}Please choose the minecraft version you want to install! If you wish to view the list of available versions, enter ${YELLOW}list" "list" display_paper_versions PAPER_VERSION "$(curl -s https://papermc.io/api/v2/projects/paper | jq -r '.versions')"
-    echo -e "${PURPLE}Installing PaperMC${DGRAY}"
-  fi
+  load_jabba
+  ask_till_valid "${PURPLE}Please choose the minecraft version you want to install! If you wish to view the list of available versions, enter ${YELLOW}list" "list" display_paper_versions PAPER_VERSION "$(curl -s https://papermc.io/api/v2/projects/paper | jq -r '.versions')"
+  echo -e "${PURPLE}Installing PaperMC${DGRAY}"
 }
 
 display_paper_versions () {
   curl -s https://papermc.io/api/v2/projects/paper | jq -r '.versions | .[] | "\u001b[32m\(.)"'
 }
+
+
+##############################
+#          Submenus          #
+##############################
+
+install_minecraft_java () {
+  echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}PaperMC"
+  read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" OPTION_TWO
+  if [[ "$OPTION_TWO" = "1" ]]; then
+    install_paper
+  fi
+}
+
+##############################
+#            Misc            #
+##############################
 
 #This function takes 3 arguments
 # $1: message: The message to repeat on fail
@@ -100,7 +121,7 @@ echo -e "${YELLOW}2${LPURPLE}) ${PURPLE}Minecraft bedrock"
 echo -e "${YELLOW}3${LPURPLE}) ${PURPLE}Discord Bots"
 read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" OPTION
 if [[ "$OPTION" = "1" ]]; then
-  install_paper
+  install_minecraft_java
 else
   echo "2"
 fi
