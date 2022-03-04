@@ -48,7 +48,7 @@ STANDOUT=$(tput smso)
 load_jabba () {
   if [[ ! -d "/home/container/.jabba" ]]; then
     echo -e "${PURPLE}Jabba not found! Installing jabba!"
-    curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash -s -- --skip-rc | awk -W interactive -v c="$DGRAY" '{ print c $0 }' && . /home/container/.jabba/jabba.sh | awk -W interactive -v c="$DGRAY" '{ print c $0 }'
+    curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash -s -- --skip-rc | awk -W interactive -v c="$DGRAY" '{ print c $0 }' && . /home/container/.jabba/jabba.sh
   fi;
   source /home/container/.jabba/jabba.sh
   if [ -z "$JAVA_VERSION" ]; then
@@ -67,7 +67,9 @@ load_jabba () {
   elif [ "$JAVA_VERSION" = "17" ]; then
     JAVA_VERSION="openjdk@1.17.0"
   fi
-  jabba install "$JAVA_VERSION"
+  echo -e "${PURPLE}Installing java ${LPURPLE}${JAVA_VERSION}${PURPLE}!"
+  jabba install "$JAVA_VERSION" >> /dev/null 2>&1
+  sleep 0.5
   jabba use "$JAVA_VERSION"
 }
 
