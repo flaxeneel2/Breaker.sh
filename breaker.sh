@@ -47,28 +47,25 @@ STANDOUT=$(tput smso)
 
 load_jabba () {
   if [[ ! -d "/home/container/.jabba" ]]; then
-    echo -e "${PURPLE}Jabba not found! Insalling jabba${DGRAY}"
-    curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash -s -- --skip-rc && . /home/container/.jabba/jabba.sh | awk -v c="$DGRAY" '{print c $0}'
-    echo -e "${NORMAL}"
+    echo -e "${PURPLE}Jabba not found! Installing jabba!"
+    curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash -s -- --skip-rc | awk -W interactive -v c="$DGRAY" '{ print c $0 }' && . /home/container/.jabba/jabba.sh | awk -W interactive -v c="$DGRAY" '{ print c $0 }'
   fi;
   source /home/container/.jabba/jabba.sh
   if [ -z "$JAVA_VERSION" ]; then
     echo -e "${PURPLE}Looks like you have not chosen a java version for your server! Please choose a java version"
-    if [ -z "${NO_TIPS+x}" ]; then
-      echo -e "${YELLOW}Tip: You can set the java version in the startup section to skip this prompt!"
-    fi
+    tip "You can set the java version in the startup section to skip this prompt!"
     echo -e "${PURPLE}Recommended values:"
     echo -e "${PURPLE}Java ${LPURPLE}8${PURPLE} for Minecraft 1.12.2 or older"
     echo -e "${PURPLE}Java ${LPURPLE}11${PURPLE} for Minecraft 1.12.2 to Minecraft 1.16.5"
     echo -e "${PURPLE}Java ${LPURPLE}17${PURPLE} for Minecraft 1.17 or newer."
     read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" JAVA_VERSION
-    if [ "$JAVA_VERSION" = "8" ]; then
-      JAVA_VERSION="adopt@1.8-0"
-    elif [ "$JAVA_VERSION" = "11" ]; then
-      JAVA_VERSION="adopt@1.11.0-0"
-    elif [ "$JAVA_VERSION" = "17" ]; then
-      JAVA_VERSION="openjdk@1.17.0"
-    fi
+  fi
+  if [ "$JAVA_VERSION" = "8" ]; then
+    JAVA_VERSION="adopt@1.8-0"
+  elif [ "$JAVA_VERSION" = "11" ]; then
+    JAVA_VERSION="adopt@1.11.0-0"
+  elif [ "$JAVA_VERSION" = "17" ]; then
+    JAVA_VERSION="openjdk@1.17.0"
   fi
   jabba install "$JAVA_VERSION"
   jabba use "$JAVA_VERSION"
@@ -107,6 +104,7 @@ get_latest_paper_build () {
 
 install_minecraft_java () {
   echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}PaperMC"
+  echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}Purpur"
   read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" OPTION_TWO
   if [[ "$OPTION_TWO" = "1" ]]; then
     install_paper
@@ -125,7 +123,6 @@ install_minecraft_java () {
 # $5: accepted_values: optional, if set, function will check if the input is valid or not
 ask_till_valid () {
   while [ -z "$ANSWER" ]; do
-    echo -e "$1"
     read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" ANSWER
     if [[ ${ANSWER,,} == "${2,,}" ]]; then
       $3
@@ -152,6 +149,12 @@ run_jar () {
   else
     echo -e "${PURPLE}Using normal startup parameters"
     java -Xms256M -Xmx"${SERVER_MEMORY}"M -jar "${SERVER_JARFILE}" | awk -W interactive -v c="$PURPLE" '{ print $0 } { if ($0 ~ ")! For help, type") { print c "Looks like your server is up!" } }'
+  fi
+}
+
+tip () {
+  if [ "$TIPS" = "1" ]; then
+    echo -e "${YELLOW}Tip: $1"
   fi
 }
 
