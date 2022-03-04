@@ -48,10 +48,30 @@ STANDOUT=$(tput smso)
 load_jabba () {
   if [[ ! -d "/home/container/.jabba" ]]; then
     echo -e "${PURPLE}Jabba not found! Insalling jabba${DGRAY}"
-    curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash -s -- --skip-rc && . /home/container/.jabba/jabba.sh
+    curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash -s -- --skip-rc && . /home/container/.jabba/jabba.sh | awk -v c="$DGRAY" '{print c $0}'
     echo -e "${NORMAL}"
   fi;
   source /home/container/.jabba/jabba.sh
+  if [ -z "$JAVA_VERSION" ]; then
+    echo -e "${PURPLE}Looks like you have not chosen a java version for your server! Please choose a java version"
+    if [ -z "${NO_TIPS+x}" ]; then
+      echo -e "${YELLOW}Tip: You can set the java version in the startup section to skip this prompt!"
+    fi
+    echo -e "${PURPLE}Recommended values:"
+    echo -e "${PURPLE}Java ${LPURPLE}8${PURPLE} for Minecraft 1.12.2 or older"
+    echo -e "${PURPLE}Java ${LPURPLE}11${PURPLE} for Minecraft 1.12.2 to Minecraft 1.16.5"
+    echo -e "${PURPLE}Java ${LPURPLE}17${PURPLE} for Minecraft 1.17 or newer."
+    read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" JAVA_VERSION
+    if [ "$JAVA_VERSION" = "8" ]; then
+      JAVA_VERSION="adopt@1.8-0"
+    elif [ "$JAVA_VERSION" = "11" ]; then
+      JAVA_VERSION="adopt@1.11.0-0"
+    elif [ "$JAVA_VERSION" = "17" ]; then
+      JAVA_VERSION="openjdk@1.17.0"
+    fi
+  fi
+  jabba install "$JAVA_VERSION"
+  jabba use "$JAVA_VERSION"
 }
 
 #############################
@@ -59,12 +79,12 @@ load_jabba () {
 #############################
 
 install_paper () {
-  load_jabba
   ask_till_valid "${PURPLE}Please choose the minecraft version you want to install! If you wish to view the list of available versions, enter ${YELLOW}list" "list" display_paper_versions PAPER_VERSION "$(curl -s https://papermc.io/api/v2/projects/paper | jq -r '.versions')"
   echo -e "${PURPLE}Installing PaperMC${DGRAY}"
   get_latest_paper_build PAPER_VERSION LATEST_PAPER_BUILD
   curl "https://papermc.io/api/v2/projects/paper/versions/${PAPER_VERSION}/builds/${LATEST_PAPER_BUILD}/downloads/paper-${PAPER_VERSION}-${LATEST_PAPER_BUILD}.jar" -o server.jar
   echo -e "${PURPLE}PaperMC installed!"
+  load_jabba
 }
 
 display_paper_versions () {
@@ -78,6 +98,7 @@ get_latest_paper_build () {
     echo "Looks like flax forgot to pass arguments for getting latest paper build!";
   fi;
 }
+
 
 
 ##############################
@@ -122,6 +143,18 @@ ask_till_valid () {
   unset "$ANSWER"
 }
 
+
+run_jar () {
+  load_jabba
+  if [ "$SMART_STARTUP" = "1" ] || [ "${SMART_STARTUP,,}" = "true" ]; then
+    echo -e "${PURPLE}Using optimized startup parameters"
+    java -Xms256M -Xmx$((SERVER_MEMORY - (SERVER_MEMORY/10)))M  -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true -jar "${SERVER_JARFILE}"
+  else
+    echo -e "${PURPLE}Using normal startup parameters"
+    java -Xms256M -Xmx"${SERVER_MEMORY}"M -jar "${SERVER_JARFILE}"
+  fi
+}
+
 ################################################
 #                     Main                     #
 ################################################
@@ -136,9 +169,8 @@ echo -e "${LPURPLE}| ${PURPLE}\$\$\$\$\$\$\$${LPURPLE}/|${PURPLE} \$\$      ${LP
 echo -e "${LPURPLE}|_______/ |__/       \\_______/ \\_______/|__/  \__/ \\_______/|__/"
 
 if [ -f "server.jar" ]; then
-  load_jabba
   echo -e "${PURPLE}Starting your server..."
-  echo -e "WIP"
+  run_jar
 else
   echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}Minecraft java"
   echo -e "${YELLOW}2${LPURPLE}) ${PURPLE}Minecraft bedrock"
