@@ -148,10 +148,10 @@ run_jar () {
   load_jabba
   if [ "$SMART_STARTUP" = "1" ] || [ "${SMART_STARTUP,,}" = "true" ]; then
     echo -e "${PURPLE}Using optimized startup parameters"
-    java -Xms256M -Xmx$((SERVER_MEMORY - (SERVER_MEMORY/10)))M  -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true -jar "${SERVER_JARFILE}"
+    java -Xms256M -Xmx$((SERVER_MEMORY - (SERVER_MEMORY/10)))M  -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true -jar "${SERVER_JARFILE}" | awk -W interactive -v c="$PURPLE" '{ print $0 } { if ($0 ~ ")! For help, type") { print c "Looks like your server is up!" } }'
   else
     echo -e "${PURPLE}Using normal startup parameters"
-    java -Xms256M -Xmx"${SERVER_MEMORY}"M -jar "${SERVER_JARFILE}"
+    java -Xms256M -Xmx"${SERVER_MEMORY}"M -jar "${SERVER_JARFILE}" | awk -W interactive -v c="$PURPLE" '{ print $0 } { if ($0 ~ ")! For help, type") { print c "Looks like your server is up!" } }'
   fi
 }
 

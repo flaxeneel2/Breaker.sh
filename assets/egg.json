@@ -4,7 +4,7 @@
     "version": "PTDL_v1",
     "update_url": null
   },
-  "exported_at": "2022-03-04T12:28:35-05:00",
+  "exported_at": "2022-03-04T17:05:30-05:00",
   "name": "Breaker.sh",
   "author": "flaxeneel2@gmail.com",
   "description": "Basically a test multi egg developed by flaxeneel2 as an excuse to learn bash",
@@ -16,7 +16,7 @@
   "startup": "\/breaker",
   "config": {
     "files": "{}",
-    "startup": "{}",
+    "startup": "{\r\n    \"done\": \"Looks like your server is up!\"\r\n}",
     "logs": "{}",
     "stop": "^C"
   },
@@ -45,6 +45,15 @@
       "user_viewable": true,
       "user_editable": true,
       "rules": "required|boolean"
+    },
+    {
+      "name": "Java version",
+      "description": "Choose the java version for your server!",
+      "env_variable": "JAVA_VERSION",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:32"
     }
   ]
 }
