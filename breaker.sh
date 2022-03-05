@@ -73,21 +73,47 @@ load_jabba () {
   jabba use "$JAVA_VERSION"
 }
 
+##############################
+#           Purpur           #
+##############################
+
+install_purpur () {
+  PURPUR_VERSIONS_LIST=$(curl -s https://api.purpurmc.org/v2/purpur)
+  ask_till_valid "${PURPLE}Please choose the minecraft version you want to install! If you wish to view the list of available versions, enter ${YELLOW}list" "list" display_purpur_versions PURPUR_VERSION "$(echo "${PURPUR_VERSIONS_LIST}" | jq -r '.versions')"
+  echo -e "${PURPLE}Installing Purpur ${LPURPLE}${PURPUR_VERSION}"
+  curl -s "https://api.purpurmc.org/v2/purpur/${PURPUR_VERSION}/latest/download" -o server.jar
+  echo -e "${PURPLE}Purpur installed!"
+  run_jar
+}
+
+display_purpur_versions () {
+  if [ -z "${PURPUR_VERSIONS_LIST+x}" ];  then
+      PURPUR_VERSIONS_LIST=$(curl -s https://api.purpurmc.org/v2/purpur)
+    fi
+    echo "$PURPUR_VERSIONS_LIST" | jq -r '.versions | .[] | "\u001b[32m\(.)"'
+}
+
+
 #############################
 #           Paper           #
 #############################
 
 install_paper () {
-  ask_till_valid "${PURPLE}Please choose the minecraft version you want to install! If you wish to view the list of available versions, enter ${YELLOW}list" "list" display_paper_versions PAPER_VERSION "$(curl -s https://papermc.io/api/v2/projects/paper | jq -r '.versions')"
+  PAPER_VERSIONS_LIST=$(curl -s https://papermc.io/api/v2/projects/paper)
+  ask_till_valid "${PURPLE}Please choose the minecraft version you want to install! If you wish to view the list of available versions, enter ${YELLOW}list" "list" display_paper_versions PAPER_VERSION "$(echo "${PAPER_VERSIONS_LIST}" | jq -r '.versions')"
   echo -e "${PURPLE}Installing PaperMC${DGRAY}"
   get_latest_paper_build PAPER_VERSION LATEST_PAPER_BUILD
-  curl "https://papermc.io/api/v2/projects/paper/versions/${PAPER_VERSION}/builds/${LATEST_PAPER_BUILD}/downloads/paper-${PAPER_VERSION}-${LATEST_PAPER_BUILD}.jar" -o server.jar
+  echo -e "${PURPLE}Installing Paper ${LPURPLE}${PURPUR_VERSION}"
+  curl -s "https://papermc.io/api/v2/projects/paper/versions/${PAPER_VERSION}/builds/${LATEST_PAPER_BUILD}/downloads/paper-${PAPER_VERSION}-${LATEST_PAPER_BUILD}.jar" -o server.jar
   echo -e "${PURPLE}PaperMC installed!"
-  load_jabba
+  run_jar
 }
 
 display_paper_versions () {
-  curl -s https://papermc.io/api/v2/projects/paper | jq -r '.versions | .[] | "\u001b[32m\(.)"'
+  if [ -z "${PAPER_VERSIONS_LIST+x}" ];  then
+    PAPER_VERSIONS_LIST=$(curl -s https://papermc.io/api/v2/projects/paper)
+  fi
+  echo "$PAPER_VERSIONS_LIST" | jq -r '.versions | .[] | "\u001b[32m\(.)"'
 }
 
 get_latest_paper_build () {
@@ -106,10 +132,12 @@ get_latest_paper_build () {
 
 install_minecraft_java () {
   echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}PaperMC"
-  echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}Purpur"
+  echo -e "${YELLOW}2${LPURPLE}) ${PURPLE}Purpur"
   read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" OPTION_TWO
-  if [[ "$OPTION_TWO" = "1" ]]; then
+  if [ "$OPTION_TWO" = "1" ]; then
     install_paper
+  elif [ "$OPTION_TWO" = "2" ]; then
+    install_purpur
   fi
 }
 
@@ -125,6 +153,7 @@ install_minecraft_java () {
 # $5: accepted_values: optional, if set, function will check if the input is valid or not
 ask_till_valid () {
   while [ -z "$ANSWER" ]; do
+    echo -e "$1"
     read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" ANSWER
     if [[ ${ANSWER,,} == "${2,,}" ]]; then
       $3
