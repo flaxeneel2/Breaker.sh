@@ -4,7 +4,7 @@
     "version": "PTDL_v1",
     "update_url": null
   },
-  "exported_at": "2022-03-04T17:05:30-05:00",
+  "exported_at": "2022-03-04T19:18:03-05:00",
   "name": "Breaker.sh",
   "author": "flaxeneel2@gmail.com",
   "description": "Basically a test multi egg developed by flaxeneel2 as an excuse to learn bash",
@@ -53,7 +53,16 @@
       "default_value": "",
       "user_viewable": true,
       "user_editable": true,
-      "rules": "required|string|max:32"
+      "rules": "nullable|string|max:32"
+    },
+    {
+      "name": "Useful Tips",
+      "description": "Disable this to remove the tips messages!",
+      "env_variable": "TIPS",
+      "default_value": "1",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|boolean"
     }
   ]
 }
