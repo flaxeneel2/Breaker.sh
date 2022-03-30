@@ -73,6 +73,44 @@ load_jabba () {
   jabba use "$JAVA_VERSION"
 }
 
+install_buildtools () {
+  if ! [ -f "/home/container/.breaker/buildtools/BuildTools.jar" ]; then
+    mkdir /home/container/.breaker/buildtools -p
+    echo -e "${DGRAY}Installing buildtools..."
+    curl -s -L https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar -o /home/container/.breaker/buildtools/BuildTools.jar
+  fi
+
+}
+
+
+##############################
+#           Spigot           #
+##############################
+
+compile_spigot () {
+  install_buildtools
+  cd /home/container/.breaker/buildtools || return
+  echo "${DGRAY}Compiling spigot..."
+  java -Xms256M -Xmx"${SERVER_MEMORY}"M -jar BuildTools.jar --rev "${!1}" --compile SPIGOT | awk -W interactive -v c="$DGRAY" '{ print c $0 }'
+  mv /home/container/.breaker/buildtools/Spigot/Spigot-Server/target/spigot-*.jar /home/container/server.jar
+  find . ! -name 'BuildTools.jar' -exec rm -rf {} + > /dev/null 2>&1
+}
+
+install_spigot () {
+  load_jabba
+  SPIGOT_VERSIONS_LIST=$(curl -s https://hub.spigotmc.org/versions/ | grep -i -E -w '"(.*.json)"' -o | tr '\n' ', ' | awk '{ print "[" substr($0, 1, length($0)-1) "]" }')
+  ask_till_valid "${PURPLE}Please choose the minecraft version you want to install! If you wish to view the list of available versions, enter ${YELLOW}list" "list" display_spigot_versions SPIGOT_VERSION "$(echo "${SPIGOT_VERSIONS_LIST}" | jq -r '. | map(. | sub(".json";""))')"
+  echo -e "${PURPLE}Installing Spigot ${LPURPLE}${SPIGOT_VERSION}"
+  compile_spigot SPIGOT_VERSION
+}
+
+display_spigot_versions () {
+  if [ -z "${SPIGOT_VERSIONS_LIST+x}" ];  then
+      SPIGOT_VERSIONS_LIST=$(curl -s https://hub.spigotmc.org/versions/ | grep -i -E -w '"(.*.json)"' -o | tr '\n' ', ' | awk '{ print "[" substr($0, 1, length($0)-1) "]" }')
+  fi
+  echo "$SPIGOT_VERSIONS_LIST" | jq -r '.[] | sub(".json";"") | select(test(".*\\..*")) | "\u001b[32m\(.)"'
+}
+
 ##############################
 #           Purpur           #
 ##############################
@@ -103,7 +141,6 @@ install_paper () {
   ask_till_valid "${PURPLE}Please choose the minecraft version you want to install! If you wish to view the list of available versions, enter ${YELLOW}list" "list" display_paper_versions PAPER_VERSION "$(echo "${PAPER_VERSIONS_LIST}" | jq -r '.versions')"
   echo -e "${PURPLE}Installing PaperMC${DGRAY}"
   get_latest_paper_build PAPER_VERSION LATEST_PAPER_BUILD
-  echo -e "${PURPLE}Installing Paper ${LPURPLE}${PURPUR_VERSION}"
   curl -s "https://papermc.io/api/v2/projects/paper/versions/${PAPER_VERSION}/builds/${LATEST_PAPER_BUILD}/downloads/paper-${PAPER_VERSION}-${LATEST_PAPER_BUILD}.jar" -o server.jar
   echo -e "${PURPLE}PaperMC installed!"
   run_jar
@@ -133,11 +170,14 @@ get_latest_paper_build () {
 install_minecraft_java () {
   echo -e "${YELLOW}1${LPURPLE}) ${PURPLE}PaperMC"
   echo -e "${YELLOW}2${LPURPLE}) ${PURPLE}Purpur"
+  echo -e "${YELLOW}3${LPURPLE}) ${PURPLE}Spigot"
   read -r -p "$(echo -e "${YELLOW}Selection: ${LPURPLE}")" OPTION_TWO
   if [ "$OPTION_TWO" = "1" ]; then
     install_paper
   elif [ "$OPTION_TWO" = "2" ]; then
     install_purpur
+  elif [ "$OPTION_TWO" = "3" ]; then
+    install_spigot
   fi
 }
 
